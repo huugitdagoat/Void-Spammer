@@ -253,9 +253,9 @@ SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 -- use case for doing it this way:
 -- a script hub could have themes in a global folder
 -- and game configs in a separate folder per game
-ThemeManager:SetFolder("MyScriptHub")
-SaveManager:SetFolder("MyScriptHub/specific-game")
-SaveManager:SetSubFolder("specific-place") -- if the game has multiple places inside of it (for example: DOORS)
+ThemeManager:SetFolder("Voidspam")
+SaveManager:SetFolder("Voidspam/VOIDSPAM")
+SaveManager:SetSubFolder("Here are the configs") -- if the game has multiple places inside of it (for example: DOORS)
 -- you can use this to save configs for those places separately
 -- The path in this script would be: MyScriptHub/specific-game/settings/specific-place
 -- [ This is optional ]
