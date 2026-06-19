@@ -1,2 +1,272 @@
-# Void-Spammer
-ts a test
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+Library.ForceCheckbox = false -- Forces AddToggle to AddCheckbox
+Library.ShowToggleFrameInKeybinds = true -- Make toggle keybinds work inside the keybinds UI (aka adds a toggle to the UI). Good for mobile users (Default value = true)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local Window = Library:CreateWindow({
+    Title = "Lua",
+    Footer = "join https://discord.gg/EaWQQX93bE For sneak peaks 👀",
+    Icon = 98215633469612,
+    NotifySide = "Right"
+})
+
+local Tabs = {
+    Main = Window:AddTab("Main", "user"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings")
+}
+
+local MainGroup = Tabs.Main:AddLeftGroupbox("Teleport", "move")
+
+
+local Settings = {
+    MinX = -2147483648,
+    MaxX = 2147483648,
+
+    MinY = -2147483648,
+    MaxY = 2147483648,
+
+    MinZ = -2147483648,
+    MaxZ = 2147483648
+}
+
+
+
+local function TeleportToVoid()
+    local Character = LocalPlayer.Character
+    if not Character then
+        return
+    end
+
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
+    if not RootPart then
+        return
+    end
+
+    local RandomX = math.random(-2147483640, 2147483640)
+    local RandomY = math.random(-2147483640, 2147483640)
+    local RandomZ = math.random(-2147483640, 2147483640)
+
+    RootPart.CFrame = CFrame.new(
+    RandomX,
+    RandomY,
+    RandomZ
+)
+
+    Description = string.format(
+    "X: %d | Y: %d | Z: %d",
+    RandomX,
+    RandomY,
+    RandomZ
+)
+end
+
+MainGroup:AddSlider("VoidYSlider", {
+    Text = "Void Y Position",
+    Default = 10000000,
+    Min = 10000000,
+    Max = 2147483640,
+    Rounding = 0,
+
+    Callback = function(Value)
+        Settings.VoidY = Value
+    end
+})
+
+MainGroup:AddSlider("VoidXSlider", {
+    Text = "Void X Position",
+    Default = 10000000,
+    Min = 10000000,
+    Max = 2147483640,
+    Rounding = 0,
+
+    Callback = function(Value)
+        Settings.VoidX = Value
+    end
+})
+
+MainGroup:AddSlider("VoidZSlider", {
+    Text = "",
+    Default = 10000000,
+    Min = 10000000,
+    Max = 2147483640,
+    Rounding = 0,
+
+    Callback = function(Value)
+    Settings.VoidZ = Value
+end
+})
+
+local Voidspam = false
+
+MainGroup:AddToggle("Voidspam", {
+    Text = "Voidspam",
+    Default = false,
+
+    Callback = function(Value)
+        Voidspam = Value
+    end
+}):AddKeyPicker("VoidspamKeybind", {
+    Default = "Q", -- Change to whatever key you want
+
+    SyncToggleState = true, -- Syncs with Auto Void toggle
+    Mode = "Toggle",
+
+    Text = "Voidspam",
+    NoUI = false,
+
+    Callback = function(Value)
+        Voidspam = Value
+    end
+})
+
+task.spawn(function()
+    while task.wait(0.001) do
+        if Voidspam then
+            TeleportToVoid()
+        end
+    end
+end)
+
+Library:Notify({
+    Title = "Loaded",
+    Description = "Void Teleporter Ready",
+    Time = 3
+})
+
+MainGroup:AddLabel("The sliders above dont do anything btw 🙃", true, "PositionLabel")
+
+task.spawn(function()
+    while task.wait(0.1) do
+        local Character = LocalPlayer.Character
+
+        if Character then
+            local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Options.PositionLabel then
+                local Pos = RootPart.Position
+
+                Options.PositionLabel:SetText(string.format(
+                    "Position\nX: %.0f\nY: %.0f\nZ: %.0f",
+                    Pos.X,
+                    Pos.Y,
+                    Pos.Z
+                ))
+            end
+        end
+
+        if Library.Unloaded then
+            break
+        end
+    end
+end)
+
+Library:AddDraggableLabel("Thanks for using huugits lua ❤️")
+
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+
+MenuGroup:AddSlider("UICornerSlider", {
+	Text = "Corner Radius",
+	Default = Library.CornerRadius,
+	Min = 0,
+	Max = 20,
+	Rounding = 0,
+	Callback = function(value)
+		Window:SetCornerRadius(value)
+	end
+})
+
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
+
+Library.ToggleKeybind = Options.MenuKeybind -- Allows you to have a custom keybind for the menu
+
+-- Addons:
+-- SaveManager (Allows you to have a configuration system)
+-- ThemeManager (Allows you to have a menu theme system)
+
+-- Hand the library over to our managers
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+-- Ignore keys that are used by ThemeManager.
+-- (we dont want configs to save themes, do we?)
+SaveManager:IgnoreThemeSettings()
+
+-- Adds our MenuKeybind to the ignore list
+-- (do you want each config to have a different menu key? probably not.)
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+
+-- use case for doing it this way:
+-- a script hub could have themes in a global folder
+-- and game configs in a separate folder per game
+ThemeManager:SetFolder("MyScriptHub")
+SaveManager:SetFolder("MyScriptHub/specific-game")
+SaveManager:SetSubFolder("specific-place") -- if the game has multiple places inside of it (for example: DOORS)
+-- you can use this to save configs for those places separately
+-- The path in this script would be: MyScriptHub/specific-game/settings/specific-place
+-- [ This is optional ]
+
+-- Builds our config menu on the right side of our tab
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+
+-- Builds our theme menu (with plenty of built in themes) on the left side
+-- NOTE: you can also call ThemeManager:ApplyToGroupbox to add it to a specific groupbox
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+
+-- You can use the SaveManager:LoadAutoloadConfig() to load a config
+-- which has been marked to be one that auto loads!
+SaveManager:LoadAutoloadConfig()
